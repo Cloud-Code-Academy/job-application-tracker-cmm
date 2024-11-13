@@ -3,7 +3,6 @@
     <fullName>Primary_Contact__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Lookup to a Contact that represents the main point of contact for the job. This could be a recruiter or employee at the company.</description>
-    <externalId>false</externalId>
     <label>Primary Contact</label>
     <referenceTo>Contact</referenceTo>
     <relationshipLabel>Job Applications</relationshipLabel>
