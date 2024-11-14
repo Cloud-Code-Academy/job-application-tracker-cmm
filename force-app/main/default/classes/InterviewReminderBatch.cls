@@ -3,20 +3,21 @@ public class InterviewReminderBatch implements Database.Batchable<SObject>, Sche
     public Database.QueryLocator start(Database.BatchableContext context){
     // Query products with expiry dates in the next 3 days
             Date tomorrow = Date.today().addDays(Days_Before_Interview);
-            String query = 'SELECT Id, Applicant__c, Interview_Date__c FROM Applicant__c ' +
-                           'WHERE Expiry_Date__c = :tomorrow';
+            String subject = 'Interview';
+            String query = 'SELECT ActivityDate, WhoId, RelatedTo, Owner, WhatId FROM Event ' +
+                           + 'WHERE ActivityDate.date() = :tomorrow';
     return Database.getQueryLocator(query);
     }
-    public void execute(Database.BatchableContext context, List<Interview__c> interviews){
+    public void execute(Database.BatchableContext context, List<Event> interviews){
             List<Messaging.SingleEmailMessage> emailsToSend = new List<Messaging.SingleEmailMessage>();
     
-            for(Interview__c interview : interviews){
+            for(Event interview : interviews){
     // Create an email message for each interview
                 String[] toAddresses;
-                toAddresses.add(interview.Applicant__r.Email);            
+                toAddresses.add(interview.WhoId);            
                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                 email.setToAddresses(toAddresses);
-                email.setSubject('Product Expiry Reminder');
+                email.setSubject('Interview Reminder');
                 email.setPlainTextBody('Test');
                 emailsToSend.add(email);
     }
