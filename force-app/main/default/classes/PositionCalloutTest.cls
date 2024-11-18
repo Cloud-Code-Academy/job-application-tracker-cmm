@@ -11,9 +11,10 @@ public with sharing class PositionCalloutTest {
 		PositionCallout.getJobs(); // Call the method
 		Test.stopTest();
 
-		String jsonResponse = '{"totalCount":1,"jobs":[{"title":"Senior Salesforce Developer","location":"Portland, OR","snippet":"&nbsp;...business? Do you enjoy being a part of a technology team that <b>develops </b>strategic solutions and supports new technology implementations...&nbsp;&nbsp;...Opportunity: \r\n \r\n Our IT Department is looking for a Senior <b>Salesforce </b>Developer to join our team to help "}]}';
-		List<Job_Position__c> positionsToCheck = createPositionsFromJson(jsonResponse);
-		System.assertEquals(positionsToCheck[0].Name = 'Senior Salesforce Developer','Title does not match');
-		System.assertEquals(positionsToCheck[0].Title = 'Portland,OR','Location does not match');
+		List<Job_Position__c> jobPositions = [SELECT Id,Name,External_Id__c FROM Job_Position__c];
+		System.assertEquals(jobPositions.size(),1, 'Positions created should be 1.');
+		System.assertEquals(jobPositions[0].Name, 'Senior Salesforce Developer','Title does not match');
+		System.assertEquals(jobPositions[0].External_Id__c, '111222333','External Id does not match');
+		//System.assertEquals(positionsToCheck[0].Description__c = 'test','Description does not match');
+		}
 	}
-}
