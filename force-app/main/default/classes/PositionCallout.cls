@@ -11,9 +11,9 @@ public with sharing class PositionCallout {
                     Job_Position__c positionRecord = new Job_Position__c();
                     positionRecord.External_Id__c = String.valueof(positionMap.get('id'));
                     positionRecord.Name = String.valueof(positionMap.get('title'));
-                    /*positionRecord.Description__c = String.valueof(positionMap.get('snippet'));
+                    positionRecord.Description__c = String.valueof(positionMap.get('snippet'));
                     positionRecord.Date_Posted__c = Date.valueof(positionMap.get('datecreatedfrom'));
-                    positionRecord.Salary__c = Integer.valueof(positionMap.get('salary'));*/
+                    //positionRecord.Salary__c = Integer.valueof(positionMap.get('salary'));
                     positionRecords.add(positionRecord);
                 }
             Database.upsert(positionRecords,Job_Position__c.External_Id__c);

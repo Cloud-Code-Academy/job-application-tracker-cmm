@@ -7,7 +7,7 @@ public with sharing class PositionMockCalloutGenerator implements HttpCalloutMoc
 		// Check if the request is a POST request
 		if (req.getMethod() == 'POST') {
 			// Return a success response for the POST request
-			res.setBody('{"totalCount": "1","jobs": [{"title":"Senior Salesforce Developer","id":"111222333"}]}');
+			res.setBody('{"totalCount": "1","jobs": [{"title":"Senior Salesforce Developer","id":"111222333","snippet":"blech"}]}');
 		}
 		res.setStatusCode(200);
 		return res;
