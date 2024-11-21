@@ -66,6 +66,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Job_Application__c.External_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Job_Application__c.Follow_up_date__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -135,7 +140,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>HR Manager</label>
+    <label>Candidate</label>
     <license>Salesforce</license>
     <objectPermissions>
         <allowCreate>true</allowCreate>
