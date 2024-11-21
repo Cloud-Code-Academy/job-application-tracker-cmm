@@ -1,23 +1,22 @@
-public with sharing class PositionCallout {
+public with sharing class ApplicationCreationCallout {
     @TestVisible // Allows test class to see this method. Since it is private, it would not be visible otherwise.
-    private static void createPositionsFromJson(String jsonResponse) {
+    private static void createApplicationsFromJson(String jsonResponse) {
         // Deserialize the JSON string into map of primitive data types.
         Map<String,Object> jsonMap = (Map<String,Object>) JSON.deserializeUntyped(jsonResponse);
-        List<Object> positions = (List<Object>) jsonMap.get('jobs');
-        List<Job_Position__c> positionRecords = new List<Job_Position__c>();
-            if(!positions.isEmpty()) {
-                for(Object positionItem : positions) {
-                    Map<String,Object> positionMap = (Map<String,Object>) positionItem;
-                    Job_Position__c positionRecord = new Job_Position__c();
-                    positionRecord.External_Id__c = String.valueOf(positionMap.get('id'));
-                    positionRecord.Name = String.valueOf(positionMap.get('title'));
-                    positionRecord.Description__c = String.valueOf(positionMap.get('snippet')).left(32768);
-                    positionRecord.Date_Posted__c = Date.valueOf(String.valueOf(positionMap.get('updated')).left(10));
-                    positionRecord.URL__c = String.valueOf(positionMap.get('link'));
-                    //positionRecord.Salary__c = Integer.valueof(positionMap.get('salary'));
-                    positionRecords.add(positionRecord);
+        List<Object> applications = (List<Object>) jsonMap.get('jobs');
+        List<Job_Application__c> applicationRecords = new List<Job_Application__c>();
+            if(!applications.isEmpty()) {
+                for(Object applicationItem : applications) {
+                    Map<String,Object> applicationMap = (Map<String,Object>) applicationItem;
+                    Job_Application__c applicationRecord = new Job_Application__c();
+                    applicationRecord.External_Id__c = String.valueOf(applicationMap.get('id'));
+                    applicationRecord.Name = String.valueOf(applicationMap.get('title'));
+                    applicationRecord.Description__c = String.valueOf(applicationMap.get('snippet')).left(32768);
+                    applicationRecord.URL__c = String.valueOf(applicationMap.get('link'));
+                    applicationRecords.add(applicationRecord);
+                    applicationRecord.Status__c = 'Saved';
                 }
-            Database.upsert(positionRecords,Job_Position__c.External_Id__c);
+            Database.upsert(applicationRecords,Job_Application__c.External_Id__c);
         }
     }
     
@@ -27,7 +26,6 @@ public with sharing class PositionCallout {
         // Create HTTP request to send.
         HttpRequest request = new HttpRequest();
         // Set the endpoint URL. Use direct URL or for best practices use Named Credential.
-        //request.setEndpoint('callout:JoobleUser');
         request.setEndpoint('https://jooble.org/api/e5d2ae19-17e9-4c4a-aa0f-6f1946d66fb2');
         //Set header
         request.setHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -44,7 +42,7 @@ public with sharing class PositionCallout {
         Integer statusCode = response.getStatusCode();
         System.debug(statusCode);
         if(statusCode >= 200 && statusCode <= 299) {
-            createPositionsFromJson(responseBody);
+            createApplicationsFromJson(responseBody);
         }
 
     }
