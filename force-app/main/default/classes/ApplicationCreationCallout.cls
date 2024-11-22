@@ -14,7 +14,6 @@ public with sharing class ApplicationCreationCallout {
                     applicationRecord.External_Id__c = externalId;
                     applicationRecord.Name = String.valueOf(applicationMap.get('title'));
                     applicationRecord.Position_Title__c = String.valueOf(applicationMap.get('title'));
-                    applicationRecord.Description__c = String.valueOf(applicationMap.get('snippet')).left(32768);
                     applicationRecord.URL__c = String.valueOf(applicationMap.get('link'));
                     applicationRecord.Location__c = String.valueOf(applicationMap.get('location'));
                     String salary = String.valueOf(applicationMap.get('salary'));
