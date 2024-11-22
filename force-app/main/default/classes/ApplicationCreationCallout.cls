@@ -5,21 +5,50 @@ public with sharing class ApplicationCreationCallout {
         Map<String,Object> jsonMap = (Map<String,Object>) JSON.deserializeUntyped(jsonResponse);
         List<Object> applications = (List<Object>) jsonMap.get('jobs');
         List<Job_Application__c> applicationRecords = new List<Job_Application__c>();
+        Map<String,String> idToCompanyName = new Map<String, String>();
             if(!applications.isEmpty()) {
                 for(Object applicationItem : applications) {
                     Map<String,Object> applicationMap = (Map<String,Object>) applicationItem;
                     Job_Application__c applicationRecord = new Job_Application__c();
-                    applicationRecord.External_Id__c = String.valueOf(applicationMap.get('id'));
+                    String externalId = String.valueOf(applicationMap.get('id'));
+                    applicationRecord.External_Id__c = externalId;
                     applicationRecord.Name = String.valueOf(applicationMap.get('title'));
+                    applicationRecord.Position_Title__c = String.valueOf(applicationMap.get('title'));
                     applicationRecord.Description__c = String.valueOf(applicationMap.get('snippet')).left(32768);
                     applicationRecord.URL__c = String.valueOf(applicationMap.get('link'));
-                    applicationRecords.add(applicationRecord);
+                    applicationRecord.Location__c = String.valueOf(applicationMap.get('location'));
+                    String salary = String.valueOf(applicationMap.get('salary'));
+                    if(salary.isNumeric() && salary != null) {
+                        applicationRecord.Salary__c = Integer.valueOf(salary);
+                    }
                     applicationRecord.Status__c = 'Saved';
+                    applicationRecords.add(applicationRecord);
+                    //idToCompanyName.put(externalId,String.valueOf(applicationMap.get('company')));
                 }
             Database.upsert(applicationRecords,Job_Application__c.External_Id__c);
         }
-    }
+/*
+    List<Job_Application__c> appsWithoutAccounts = [SELECT External_Id__c,Id FROM Job_Application__c WHERE Company_Name__c = '' ];
+    System.debug(appsWithoutAccounts);
+    Map<Id,Account> appIdToAccountMap = new Map<Id,Account>();
+    List<Account> accountsToCreate = new List<Account>();
+    for (Job_Application__c application : appsWithoutAccounts) {
+            Account acc = new Account(Name = idToCompanyName.get(application.External_Id__c));
+            appIdToAccountMap.put(application.Id,acc);
+            accountsToCreate.add(acc);
+        }
+    insert accountsToCreate;
+    System.debug(accountsToCreate);
     
+    List<Job_Application__c> appsToUpdate = new List<Job_Application__c>();
+    for(Job_Application__c application : appsWithoutAccounts) {
+        application.Company_Name__c = appIdToAccountMap.get(application.Id).Id;
+        appsToUpdate.add(application);
+    }
+    update appsToUpdate;
+    */
+}
+
     @future(callout = true)
     public static void getJobs() {
         Map<String,String> keywordMap = new Map<String,String>();
