@@ -17,7 +17,7 @@ public with sharing class ApplicationCreationCallout {
                     applicationRecord.URL__c = String.valueOf(applicationMap.get('link'));
                     applicationRecord.Location__c = String.valueOf(applicationMap.get('location'));
                     String salary = String.valueOf(applicationMap.get('salary'));
-                    if(salary.isNumeric() && salary != null) {
+                    if(salary != null) {
                         applicationRecord.Salary__c = Integer.valueOf(salary);
                     }
                     applicationRecord.Status__c = 'Saved';
