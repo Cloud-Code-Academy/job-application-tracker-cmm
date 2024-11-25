@@ -5,7 +5,8 @@ public with sharing class ApplicationCreationCallout {
         Map<String,Object> jsonMap = (Map<String,Object>) JSON.deserializeUntyped(jsonResponse);
         List<Object> applications = (List<Object>) jsonMap.get('jobs');
         List<Job_Application__c> applicationRecords = new List<Job_Application__c>();
-        Map<String,String> idToCompanyName = new Map<String, String>();
+        Set<String> accountNames = new Set<String>();
+        Map<Job_Application__c,String> appToAccountNameMap = new Map<Job_Application__c,String>();
             if(!applications.isEmpty()) {
                 for(Object applicationItem : applications) {
                     Map<String,Object> applicationMap = (Map<String,Object>) applicationItem;
@@ -22,30 +23,33 @@ public with sharing class ApplicationCreationCallout {
                     }
                     applicationRecord.Status__c = 'Saved';
                     applicationRecords.add(applicationRecord);
-                    //idToCompanyName.put(externalId,String.valueOf(applicationMap.get('company')));
+                    appToAccountNameMap.put(applicationRecord,String.valueOf(applicationMap.get('company')));
                 }
-            Database.upsert(applicationRecords,Job_Application__c.External_Id__c);
-        }
-/*
-    List<Job_Application__c> appsWithoutAccounts = [SELECT External_Id__c,Id FROM Job_Application__c WHERE Company_Name__c = '' ];
-    System.debug(appsWithoutAccounts);
-    Map<Id,Account> appIdToAccountMap = new Map<Id,Account>();
-    List<Account> accountsToCreate = new List<Account>();
-    for (Job_Application__c application : appsWithoutAccounts) {
-            Account acc = new Account(Name = idToCompanyName.get(application.External_Id__c));
-            appIdToAccountMap.put(application.Id,acc);
-            accountsToCreate.add(acc);
-        }
-    insert accountsToCreate;
-    System.debug(accountsToCreate);
-    
-    List<Job_Application__c> appsToUpdate = new List<Job_Application__c>();
-    for(Job_Application__c application : appsWithoutAccounts) {
-        application.Company_Name__c = appIdToAccountMap.get(application.Id).Id;
-        appsToUpdate.add(application);
-    }
-    update appsToUpdate;
-    */
+                //Query existing accounts that match the company names
+                List<Account> existingAccountsList = [SELECT Id, Name FROM Account WHERE Name IN :appToAccountNameMap.values()];
+                Set<Account> existingAccountsSet = new Set<Account>();
+                existingAccountsSet.addAll(existingAccountsList);
+                //Create accounts that don't exist yet and add to list
+                /*for (Job_Application__c application : applicationRecords) {
+                    String companyName = appToAccountNameMap.get(application);
+                    Account acc;
+                    if (!existingAccounts.Name.contains(companyName)) {
+                        acc = new Account(Name=companyname);
+                        }
+                    else {
+                        acc = 
+                    }
+                    application.Company_Name__c = acc.Id;
+                }
+                */
+
+                //Associate children job applications to parent accounts
+
+
+                //Update job applications
+                Database.upsert(applicationRecords,Job_Application__c.External_Id__c);
+            }
+
 }
 
     @future(callout = true)
