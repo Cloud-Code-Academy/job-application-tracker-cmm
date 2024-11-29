@@ -1,4 +1,4 @@
-trigger JobApplicationTrigger on Job_Application__c (after insert, after update) {
+trigger JobApplicationTrigger on Job_Application__c (before insert, after insert, after update) {
     System.debug('Trigger executed');
     JobApplicationTriggerHandler handler = new JobApplicationTriggerHandler();
     handler.run();
