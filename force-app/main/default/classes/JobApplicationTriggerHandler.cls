@@ -29,12 +29,43 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
                             '2. Review your notes and reflect on areas of improvement'
     };
 
+    public static void jobApplicationSetPrimaryContact(List<Job_Application__c> jobApps) {
+        Map<Id,Id> jobAppIdAccountMap = new Map<Id,Id>();
+        //Loop through job applications and add application Id and Company Id in map
+        for (Job_Application__c jobApp : jobApps) {
+            if(jobApp.Company_Name__c != null && jobApp.Primary_Contact__c == null) {
+                jobAppIdAccountMap.put(jobApp.Id,jobApp.Company_Name__r.Id);
+            }
+        }
+        //Create maps for contacts with SOQL queries
+        Map<Id,Contact> contactMap = new Map<Id,Contact>([SELECT Id FROM Contact WHERE AccountId in :jobAppIdAccountMap.values()]);
+        Map<Id,Id> accountToContactMap = new Map<Id,Id>();
+
+        //Loop through contact map
+        for (Contact con : contactMap.values()) {
+            if(!accountToContactMap.containsKey(con.Id)) {
+                accountToContactMap.put(con.Id,con.AccountId);
+            }
+        }
+
+        for (Job_Application__c jobApp : jobApps) {
+            if(jobApp.Company_Name__c != null & jobApp.Primary_Contact__c == null) {
+                String primaryContactId = accountToContactMap.get(jobApp.Company_Name__c);
+                jobApp.Primary_Contact__c = primaryContactId;
+            }
+        }
+
+    }
+
     public override void afterInsert() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
+        jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
     }
 
     public override void afterUpdate() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
+        jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
+        
     }
 
     public void createTasksForStatusChange(List<Job_Application__c> applications) {
