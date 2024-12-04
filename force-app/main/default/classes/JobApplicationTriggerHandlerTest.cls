@@ -1,6 +1,45 @@
 @isTest
 public with sharing class JobApplicationTriggerHandlerTest {
 
+    @isTest
+    static void jobApplicationPrimaryContactPositive() {
+        Account acc1 = new Account(Name='account1');
+        insert acc1;
+        Contact con1 = new Contact(LastName='con1',AccountId=acc1.Id);
+        insert con1;
+        Job_Application__c jobApp1 = new Job_Application__c(Name='jobapp1',Company_Name__c=acc1.Id);
+        List<Job_Application__c> jobApps = new List<Job_Application__c>();
+        jobApps.add(jobApp1);
+
+        Test.startTest();
+            insert jobApps;
+        Test.stopTest();
+
+        List<Job_Application__c> jobAppsNew = [SELECT Id,Primary_Contact__c FROM Job_Application__c];
+    
+        System.assertEquals(con1.Id,jobAppsNew[0].Primary_Contact__c,'No Contact should be attached.');
+    }
+
+    @isTest
+    static void jobApplicationPrimaryContactNegative() {
+        Account acc1 = new Account(Name='account1');
+        insert acc1;
+        Contact con1 = new Contact(LastName='con1',AccountId=acc1.Id);
+        insert con1;
+        Job_Application__c jobApp1 = new Job_Application__c(Name='jobapp1');
+        List<Job_Application__c> jobApps = new List<Job_Application__c>();
+        jobApps.add(jobApp1);
+
+        Test.startTest();
+            insert jobApps;
+        Test.stopTest();
+
+        List<Job_Application__c> jobAppsNew = [SELECT Id,Primary_Contact__c FROM Job_Application__c];
+
+        System.assertEquals(null,jobAppsNew[0].Primary_Contact__c,'no contact should be populated');
+
+    }
+
     // Test method for initial insert and task creation
     @isTest
     static void testInsertJobApplication(){

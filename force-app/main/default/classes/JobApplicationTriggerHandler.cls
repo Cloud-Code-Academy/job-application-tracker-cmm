@@ -71,6 +71,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     public override void beforeUpdate() {
         TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
     }
+
     public override void afterInsert() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
     }
