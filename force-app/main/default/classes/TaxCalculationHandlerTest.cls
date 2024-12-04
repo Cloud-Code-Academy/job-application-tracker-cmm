@@ -80,6 +80,7 @@ private class TaxCalculationHandlerTest {
 
         // Refresh jobApp from database to get calculated values
         jobApp = [SELECT Annually__c, Semi_annually__c, Monthly__c, Bi_weekly__c FROM Job_Application__c WHERE Id = :jobApp.Id];
+        System.debug('Calculated Annually: ' + jobApp.Annually__c);
         Decimal originalAnnually = jobApp.Annually__c;
 
         // Attempt to manually update the calculated fields
