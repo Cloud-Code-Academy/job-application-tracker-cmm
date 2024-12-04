@@ -29,20 +29,61 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
                             '2. Review your notes and reflect on areas of improvement'
     };
 
+    public static void jobApplicationSetPrimaryContact(List<Job_Application__c> jobApps) {
+        Map<Job_Application__c,Id> jobAppAccountMap = new Map<Job_Application__c,Id>();
+        List<String> accountList = new List<String>();
+        //Loop through job applications and add application Id and Company Id in map
+        for (Job_Application__c jobApp : jobApps) {
+            if(jobApp.Company_Name__c != null && jobApp.Primary_Contact__c == null) {
+                accountList.add(jobApp.Company_Name__c);
+                }
+            }
+            System.debug(accountList);
+        //Find all accounts
+        Map<Id,Contact> contactMap = new Map<Id,Contact>([SELECT Id, AccountId FROM Contact WHERE AccountId in :accountList]);
+        System.debug(contactMap);
+        Map<Id,Id> accountToContactMap = new Map<Id,Id>();
+
+        //Loop through contact map
+        for (Contact con : contactMap.values()) {
+            String accId = con.AccountId;
+            if(!accountToContactMap.containsKey(accId)) {
+                accountToContactMap.put(accId,con.Id);
+            }
+        }
+
+        System.debug(accountToContactMap);
+
+        for (Job_Application__c jobApp : jobApps) {
+            System.debug(jobApp);
+            if(jobApp.Company_Name__c != null & jobApp.Primary_Contact__c == null & accountToContactMap.containskey(jobApp.Company_Name__c)) {
+                String primaryContactId = accountToContactMap.get(jobApp.Company_Name__c);
+                jobApp.Primary_Contact__c = primaryContactId;
+            }
+        }
+    }
+
+    public override void beforeInsert() {
+            TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+            jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
+        }
+    
+    public override void beforeUpdate() {
+        TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+    }
     public override void afterInsert() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
     }
 
     public override void afterUpdate() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
+        jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
+        
     }
 
     public void createTasksForStatusChange(List<Job_Application__c> applications) {
         List<Task> tasksToCreate = new List<Task>();
 
-        List<Job_Application__c> applicationsStatus = [SELECT Status__c FROM Job_Application__c];
-        for (Job_Application__c app : applications) {
-        }
 
         for(Job_Application__c app : applications) {
                 String taskDescription = STATUS_TO_DESCRIPTION.get(app.Status__c);
@@ -77,4 +118,5 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         t.WhatId = app.Id;
         return t;
     } 
+
 }
