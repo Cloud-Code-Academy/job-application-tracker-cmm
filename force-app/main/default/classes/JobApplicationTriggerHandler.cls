@@ -115,7 +115,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         t.Status = 'Not Started';
         t.ActivityDate = System.today().addDays(3);
         t.Priority = priority;
-        t.WhoId = app.Applicant__c;
+        t.WhoId = app.Primary_Contact__c;
         t.WhatId = app.Id;
         return t;
     } 
