@@ -54,7 +54,6 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
 
         System.debug(accountToContactMap);
 
-        //Assign contact from map to job application
         for (Job_Application__c jobApp : jobApps) {
             System.debug(jobApp);
             if(jobApp.Company_Name__c != null & jobApp.Primary_Contact__c == null & accountToContactMap.containskey(jobApp.Company_Name__c)) {
