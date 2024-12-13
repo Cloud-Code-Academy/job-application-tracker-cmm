@@ -44,6 +44,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
     @isTest
     static void testInsertJobApplication(){
         // Setup test data
+        User testUser = [SELECT Id FROM User WHERE LastName='Applicant'];
+        
         Account newAccount = new Account();
         newAccount.Name = 'Test Account';
         insert newAccount;
@@ -58,13 +60,14 @@ public with sharing class JobApplicationTriggerHandlerTest {
         newJob.Name = 'Test Job';
         newJob.Account__c = newAccount.Id;
         insert newJob;
-
+        
         // Create a new Job Application record
         Job_Application__c newApp = new Job_Application__c();
         newApp.Status__c = 'Saved';
         newApp.Primary_Contact__c = newContact.Id;
         newApp.Job_Position__c = newJob.Id;
         newApp.Name = 'Test Application';
+        newApp.OwnerId = testUser.Id;
         
         Test.startTest();
         insert newApp;
@@ -76,7 +79,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
                 Description, 
                 Status,
                 WhatId,
-                WhoId 
+                WhoId,
+             	OwnerId
             FROM Task
             WHERE WhatId = :newApp.Id];
 
@@ -88,7 +92,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
                                             '2. Review the highlighted skills to see if the role is a good fit' + '\n' +
                                             '3. Research company or role and mark your excitement level';
         System.assertEquals(expectedSavedDescription, tasks[0].Description, 'The task description should be ' + expectedSavedDescription + ', actual: ' + tasks[0].Description);
-        //System.assertEquals(newApp.Primary_Contact__r.Id, tasks[0].WhoId, 'The task should be associated with the correct Contact record');
+        System.assertEquals(newContact.Id, tasks[0].WhoId, 'The task should be associated with the correct Contact record');
+        System.assertEquals(testUser.Id, tasks[0].OwnerId, 'The task Owner/Assigned To should be the same as the application owner.');
         System.assertEquals(newApp.Id, tasks[0].WhatId, 'The task should be associated with the correct Job Application record');
     }
 
@@ -96,6 +101,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
     @isTest
     static void testUpdateJobApplicationWithoutStatusChange(){
         // Setup test data
+        User testUser = [SELECT Id FROM User WHERE LastName='Applicant'];
+        
         Account newAccount = new Account();
         newAccount.Name = 'Test Account';
         insert newAccount;
@@ -113,7 +120,7 @@ public with sharing class JobApplicationTriggerHandlerTest {
 
         Job_Application__c newApp = new Job_Application__c();
         newApp.Status__c = 'Saved';
-        newApp.Applicant__c = newContact.Id;
+        newApp.Primary_Contact__c = newContact.Id;
         newApp.Job_Position__c = newJob.Id;
         newApp.Name = 'Test Application';
         insert newApp;
@@ -135,6 +142,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
     @isTest
     static void testUpdateJobApplicationWithStatusChange(){
         // Setup test data
+        User testUser = [SELECT Id FROM User WHERE LastName='Applicant'];
+        
         Account newAccount = new Account();
         newAccount.Name = 'Test Account';
         insert newAccount;
@@ -155,6 +164,7 @@ public with sharing class JobApplicationTriggerHandlerTest {
         newApp.Primary_Contact__c = newContact.Id;
         newApp.Job_Position__c = newJob.Id;
         newApp.Name = 'Test Application';
+        newApp.OwnerId = testUser.Id;
         insert newApp;
 
         // Update status to Negotiating
@@ -164,7 +174,7 @@ public with sharing class JobApplicationTriggerHandlerTest {
         update newApp;
         Test.stopTest();
 
-        List<Task> tasks = [SELECT Subject, Description, Status, WhatId, WhoId FROM Task WHERE WhatId = :newApp.Id];
+        List<Task> tasks = [SELECT Subject, Description, Status, WhatId, WhoId, OwnerId FROM Task WHERE WhatId = :newApp.Id];
 
         // Assert that two tasks have been created
         System.assertEquals(2, tasks.size(), 'There should be two tasks created, actual created: ' + tasks.size());
@@ -176,7 +186,8 @@ public with sharing class JobApplicationTriggerHandlerTest {
                                                 '4. Set up a meeting with your manager to discuss your offer' + '\n' +
                                                 '5. Review the benefits package and ask questions';
         System.assertEquals(expectedNegotiatingDescription, tasks[1].Description, 'The task description should be ' + expectedNegotiatingDescription + ', actual: ' + tasks[1].Description);
-        //System.assertEquals(newContact.Id, tasks[1].WhoId, 'The task should be associated with the correct Contact record');
+        System.assertEquals(testUser.Id, tasks[1].OwnerId, 'The task Owner/Assigned To should be the same as the application owner.');
+        System.assertEquals(newContact.Id, tasks[1].WhoId, 'The task should be associated with the correct Contact record');
         System.assertEquals(newApp.Id, tasks[1].WhatId, 'The task should be associated with the correct Job Application record');
     }
 }

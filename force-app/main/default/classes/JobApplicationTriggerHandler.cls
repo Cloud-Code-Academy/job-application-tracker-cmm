@@ -117,6 +117,7 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         t.Priority = priority;
         t.WhoId = app.Primary_Contact__c;
         t.WhatId = app.Id;
+        t.OwnerId = app.OwnerId;
         return t;
     } 
 
