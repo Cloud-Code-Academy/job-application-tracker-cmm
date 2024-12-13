@@ -31,6 +31,9 @@ public with sharing class ApplicationCreationCalloutTest {
 			//Create account
 			Account acc = new Account(Name='V2');
 			insert acc;
+
+			//Query user
+			User owner = [SELECT Id FROM User WHERE LastName = 'Applicant'];
 	
 			// As this is a future method, we need to enclose it in Test.startTest() and Test.stopTest() to ensure it's executed in the test context.
 			Test.startTest();
@@ -45,6 +48,7 @@ public with sharing class ApplicationCreationCalloutTest {
 			System.assertEquals('Senior Salesforce Developer',jobApplications[0].Name,'Title does not match');
 			System.assertEquals('111222333',jobApplications[0].External_Id__c,'External Id does not match.');
 			System.assertEquals(60000,jobApplications[0].Salary__c,'Salary does not match');
+			System.assertEquals(owner.Id,jobApplications[0].OwnerId,'Owner does not match');
 			System.assertEquals('Columbus, OH',jobApplications[0].Location__c,'Location does not match');
 			System.assertEquals(accountList[0].Id,jobApplications[0].Company_Name__c,'Account is not correct.');
 			}
