@@ -17,7 +17,7 @@ public with sharing class JobApplicationTriggerHandlerTest {
 
         List<Job_Application__c> jobAppsNew = [SELECT Id,Primary_Contact__c FROM Job_Application__c];
     
-        System.assertEquals(con1.Id,jobAppsNew[0].Primary_Contact__c,'No Contact should be attached.');
+        System.assertEquals(con1.Id,jobAppsNew[0].Primary_Contact__c,'Primary Contact is not correct.');
     }
 
     @isTest

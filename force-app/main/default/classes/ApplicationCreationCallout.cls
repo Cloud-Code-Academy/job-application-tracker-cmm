@@ -14,6 +14,9 @@ public with sharing class ApplicationCreationCallout {
 
         //Create a map of account names to Ids
         Map<String,Id> accountNameToIdMap = new Map<String,Id>();
+
+        //Find Sally user
+        User sallyUser= [SELECT Id FROM User WHERE LastName='Applicant'];
         
         //Loop through application items to create applications and add them to list
         if(!applications.isEmpty()) {
@@ -26,6 +29,7 @@ public with sharing class ApplicationCreationCallout {
                 applicationRecord.Position_Title__c = String.valueOf(applicationMap.get('title'));
                 applicationRecord.URL__c = String.valueOf(applicationMap.get('link'));
                 applicationRecord.Location__c = String.valueOf(applicationMap.get('location'));
+                applicationRecord.OwnerId = sallyUser.Id;
                 String salary = String.valueOf(applicationMap.get('salary'));
                 if(salary != null & salary != '' & salary.isNumeric()) {
                         applicationRecord.Salary__c = Integer.valueOf(salary);
