@@ -64,12 +64,12 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-            TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+            TaxCalculationHandler.calculateTaxesAndTakeHomePay(Trigger.new);
             jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
         }
     
     public override void beforeUpdate() {
-        TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+        TaxCalculationHandler.calculateTaxesAndTakeHomePay(Trigger.new);
     }
 
     public override void afterInsert() {
