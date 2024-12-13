@@ -62,13 +62,17 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
                 jobApp.Primary_Contact__c = primaryContactId;
             }
         }
-
     }
 
     public override void beforeInsert() {
-        jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
-    }
+            TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+            jobApplicationSetPrimaryContact((List<Job_Application__c>) Trigger.new);
+        }
     
+    public override void beforeUpdate() {
+        TaxCalculationHandler.calculateTaxesAndTakeHomePay (Trigger.new);
+    }
+
     public override void afterInsert() {
         createTasksForStatusChange((List<Job_Application__c>) Trigger.new);
     }
@@ -82,9 +86,6 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
     public void createTasksForStatusChange(List<Job_Application__c> applications) {
         List<Task> tasksToCreate = new List<Task>();
 
-        List<Job_Application__c> applicationsStatus = [SELECT Status__c FROM Job_Application__c];
-        for (Job_Application__c app : applications) {
-        }
 
         for(Job_Application__c app : applications) {
                 String taskDescription = STATUS_TO_DESCRIPTION.get(app.Status__c);
@@ -115,8 +116,9 @@ public with sharing class JobApplicationTriggerHandler extends TriggerHandler {
         t.Status = 'Not Started';
         t.ActivityDate = System.today().addDays(3);
         t.Priority = priority;
-        t.WhoId = app.Applicant__c;
+        t.WhoId = app.Primary_Contact__c;
         t.WhatId = app.Id;
         return t;
     } 
+
 }
