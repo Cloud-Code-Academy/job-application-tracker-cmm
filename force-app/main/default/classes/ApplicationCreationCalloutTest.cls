@@ -42,7 +42,7 @@ public with sharing class ApplicationCreationCalloutTest {
 	
 			List<Account> accountList = [SELECT Id FROM Account WHERE Name = 'V2'];
 			
-			List<Job_Application__c> jobApplications = [SELECT Id,Name,External_Id__c,Salary__c,Location__c,Company_Name__c FROM Job_Application__c];
+			List<Job_Application__c> jobApplications = [SELECT Id,Name,External_Id__c,Salary__c,Location__c,Company_Name__c,OwnerId FROM Job_Application__c];
 			System.assertEquals(1,accountList.size(),'No additional accounts should have been created.');
 			System.assertEquals(1,jobApplications.size(), 'Positions created should be 1.');
 			System.assertEquals('Senior Salesforce Developer',jobApplications[0].Name,'Title does not match');
